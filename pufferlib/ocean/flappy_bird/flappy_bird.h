@@ -7,8 +7,9 @@
 #define HEIGHT 800
 #define PIPE_SEPARATION 200
 
+#define num_pipes_screen 3
+
 int gravity = 1;
-int num_pipes_screen = 3;
 
 typedef struct {
   int y_pos;
@@ -26,16 +27,29 @@ typedef struct {
   int gapWidth;
 } PipePair;
 
-Bird *generateBird() {
+typedef struct {
+  int state[4];
+  int action;
+  int reward;
+  bool done;
+} Flappy_env;
+
+typedef struct {
+  Bird bird;  
+  PipePair pipes[num_pipes_screen];
+
+} Flappy_client;
+
+Bird generateBird() {
   Bird *bird = (Bird *)calloc(1, sizeof(Bird));
   bird->y_pos = 200;
   bird->x_pos = 200;
   bird->radius = 15;
 
-  return bird;
+  return *bird;
 }
 
-PipePair *new_pipe() {
+PipePair new_pipe() {
   PipePair *pipes = (PipePair *)calloc(1, sizeof(PipePair));
 
   pipes->velocity = 1;
@@ -44,45 +58,54 @@ PipePair *new_pipe() {
   pipes->gapSize = 125 + ((rand() % 75));
   pipes->gapWidth = 100;
 
-  return pipes;
+  return *pipes;
 }
 
 // setPipeList sets the initial 2 pipes, afterwards new pipes are generated one
 // by one
-void setPipeList(PipePair *pipes[num_pipes_screen]) {
-  pipes[0] = (PipePair *)calloc(1, sizeof(PipePair));
+void setPipeList(Flappy_client *client) {
+  client->pipes[0] = *(PipePair *)calloc(1, sizeof(PipePair));
   for (int i = 1; i < num_pipes_screen; i++) {
-    pipes[i] = new_pipe();
+    client->pipes[i] = new_pipe();
   }
 }
 
-void renderPipes(PipePair *pipes[num_pipes_screen], int pipeNum) {
+Flappy_client *generate_client() {
+  Flappy_client *client = (Flappy_client *)calloc(1, sizeof(Flappy_client));
 
-  DrawRectangle(pipes[pipeNum]->gapX, 0, pipes[pipeNum]->gapWidth,
-                pipes[pipeNum]->gapY, GREEN);
-  DrawRectangle(pipes[pipeNum]->gapX,
-                pipes[pipeNum]->gapY + pipes[pipeNum]->gapSize,
-                pipes[pipeNum]->gapWidth,
-                HEIGHT - pipes[pipeNum]->gapY + pipes[pipeNum]->gapSize, GREEN);
+  client->bird = generateBird();
+  setPipeList(client);
 
-  pipes[pipeNum]->gapX -= pipes[pipeNum]->velocity;
+  return client;
 }
 
-bool checkCollisions(Bird *bird, PipePair *pipes) {
+void renderPipes(PipePair pipes[num_pipes_screen], int pipeNum) {
 
-  if (bird->y_pos > HEIGHT)
+  DrawRectangle(pipes[pipeNum].gapX, 0, pipes[pipeNum].gapWidth,
+                pipes[pipeNum].gapY, GREEN);
+  DrawRectangle(pipes[pipeNum].gapX,
+                pipes[pipeNum].gapY + pipes[pipeNum].gapSize,
+                pipes[pipeNum].gapWidth,
+                HEIGHT - pipes[pipeNum].gapY + pipes[pipeNum].gapSize, GREEN);
+
+  pipes[pipeNum].gapX -= pipes[pipeNum].velocity;
+}
+
+bool checkCollisions(Bird bird, PipePair pipes) {
+
+  if (bird.y_pos > HEIGHT)
     return true;
 
 
   //check collision with the top pipe
-  bool collisionY = bird->y_pos - bird->radius < pipes->gapY;
-  bool collisionX = bird->x_pos + bird->radius > pipes->gapX;
+  bool collisionY = bird.y_pos - bird.radius < pipes.gapY;
+  bool collisionX = bird.x_pos + bird.radius > pipes.gapX;
 
   if (collisionX && collisionY)
     return true;
 
   //check collision for the bottom poipe
-  collisionY = bird->y_pos + bird->radius > pipes->gapY + pipes->gapSize;
+  collisionY = bird.y_pos + bird.radius > pipes.gapY + pipes.gapSize;
 
   if (collisionY && collisionX) return true;
 

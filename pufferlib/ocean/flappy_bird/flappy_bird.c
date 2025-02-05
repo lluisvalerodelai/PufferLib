@@ -9,16 +9,14 @@ int main(void) {
   unsigned int score = 0;
   char str[32];
 
-  Bird *bird = generateBird();
-  PipePair *pipes[num_pipes_screen];
-  setPipeList(pipes);
+  Flappy_client *client = generate_client();
 
   while (!WindowShouldClose()) {
 
     if (GetKeyPressed() == KEY_SPACE) {
-      bird->vertical_velocity = -10;
+      client->bird.vertical_velocity = -10;
     }
-    bird->y_pos += bird->vertical_velocity;
+    client->bird.y_pos += client->bird.vertical_velocity;
 
     BeginDrawing();
 
@@ -26,28 +24,28 @@ int main(void) {
     DrawText(score_str, 0, 0, 50, WHITE);
     free(score_str);
 
-    DrawCircle(bird->x_pos, bird->y_pos, bird->radius, RED);
-    renderPipes(pipes, 0);
+    DrawCircle(client->bird.x_pos, client->bird.y_pos, client->bird.radius, RED);
+    renderPipes(client->pipes, 0);
 
     ClearBackground(SKYBLUE);
     EndDrawing();
 
-    if (bird->vertical_velocity < 20) {
-      bird->vertical_velocity += gravity;
+    if (client->bird.vertical_velocity < 20) {
+      client->bird.vertical_velocity += gravity;
     }
 
-    if (pipes[0]->gapX < bird->x_pos) {
-      renderPipes(pipes, 1);
+    if (client->pipes[0].gapX < client->bird.x_pos) {
+      renderPipes(client->pipes, 1);
     }
 
-    if (pipes[1]->gapX + pipes[1]->gapWidth < bird->x_pos) {
-      renderPipes(pipes, 2);
-      pipes[0] = pipes[1];
-      pipes[1] = pipes[2];
-      pipes[2] = new_pipe();
+    if (client->pipes[1].gapX + client->pipes[1].gapWidth < client->bird.x_pos) {
+      renderPipes(client->pipes, 2);
+      client->pipes[0] = client->pipes[1];
+      client->pipes[1] = client->pipes[2];
+      client->pipes[2] = new_pipe();
     }
 
-    if (checkCollisions(bird, pipes[1])) {
+    if (checkCollisions(client->bird, client->pipes[1])) {
       done = true;
       break;
     } else {
