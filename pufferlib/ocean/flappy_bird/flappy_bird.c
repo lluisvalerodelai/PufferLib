@@ -13,7 +13,7 @@ int main(void) {
   InitWindow(WIDTH, HEIGHT, "Flappy bird");
   SetTargetFPS(60);
 
-  //c_reset(env)
+  // c_reset(env)
 
   while (!WindowShouldClose()) {
 
@@ -32,7 +32,6 @@ int main(void) {
   }
 
   CloseWindow();
-  // free everything
   free(env);
   free(client);
 
