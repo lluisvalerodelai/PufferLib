@@ -3,13 +3,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define WIDTH 500
-#define HEIGHT 800
-#define PIPE_SEPARATION 200
-#define NOOP 0
-#define JUMP 1
-
-#define num_pipes_screen 3
+int WIDTH = 500;
+int HEIGHT = 800;
+int PIPE_SEPARATION = 200;
+int NOOP = 0;
+int JUMP = 1;
+int num_pipes_screen = 3;
 
 int gravity = 1;
 

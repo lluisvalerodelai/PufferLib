@@ -11,7 +11,7 @@ int main(void) {
   Flappy_env *env = generateEnv();
 
   InitWindow(WIDTH, HEIGHT, "Flappy bird");
-  SetTargetFPS(60);
+  SetTargetFPS(80);
 
   // c_reset(env)
 
