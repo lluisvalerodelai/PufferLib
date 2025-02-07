@@ -4,36 +4,29 @@
 
 int main(void) {
 
-  // Weights* weights = load_weights("resources/pong_weights.bin", 133764);
-  // LinearLSTM* net = make_linearlstm(weights, 1, 8, 3);
+  Flappy_env env;
+  allocate(&env); //set all the default/0 values for the env
+  
+  Flappy_client *client = make_client(); //client is for rendering, heandles the initwindow stuff so that later we can pass it to python and get it to render in python
 
-  Flappy_client *client = generate_client();
-  Flappy_env *env = generateEnv();
-
-  InitWindow(WIDTH, HEIGHT, "Flappy bird");
-  SetTargetFPS(80);
-
-  // c_reset(env)
-
+  c_reset(&env); 
   while (!WindowShouldClose()) {
 
-    if (GetKeyPressed() == KEY_SPACE) {
-      env->action = JUMP;
-    } else {
-      env->action = NOOP;
-    }
-
-    c_step(env, client);
-    c_render(env, client);
-
-    if (env->done) {
+    if (env.done) {
       break;
     }
+
+    //the bird jumps when the key is pressed, not in down position
+    //otherwise the bird flies upwards
+    if (GetKeyPressed() == KEY_SPACE) {
+      env.action = JUMP;
+    } else {
+      env.action = NOOP;
+    }
+  
+    c_step(&env);
+    c_render(client, &env);
   }
+  
 
-  CloseWindow();
-  free(env);
-  free(client);
-
-  return 0;
 }
