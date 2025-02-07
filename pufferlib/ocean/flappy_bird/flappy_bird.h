@@ -8,7 +8,6 @@ int HEIGHT = 800;
 int PIPE_SEPARATION = 200;
 int NOOP = 0;
 int JUMP = 1;
-int num_pipes_screen = 3;
 
 int gravity = 1;
 
@@ -37,7 +36,7 @@ typedef struct {
 
 typedef struct {
   Bird *bird;
-  PipePair pipes[num_pipes_screen];
+  PipePair pipes[3];
 
 } Flappy_client;
 
@@ -72,7 +71,7 @@ PipePair new_pipe() {
 void setPipeList(Flappy_client *client) {
   client->pipes[0] =
       *(PipePair *)calloc(1, sizeof(PipePair)); // we dont render pipe 0
-  for (int i = 1; i < num_pipes_screen; i++) {
+  for (int i = 1; i < 3; i++) {
     client->pipes[i] = new_pipe();
   }
 }
@@ -86,7 +85,7 @@ Flappy_client *generate_client() {
   return client;
 }
 
-void renderPipes(PipePair pipes[num_pipes_screen], int pipeNum) {
+void renderPipes(PipePair pipes[3], int pipeNum) {
 
   DrawRectangle(pipes[pipeNum].gapX, 0, pipes[pipeNum].gapWidth,
                 pipes[pipeNum].gapY, GREEN);
