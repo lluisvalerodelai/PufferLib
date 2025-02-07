@@ -64,7 +64,9 @@ void setPipeList(PipePair *pipes) {
 void allocate(Flappy_env *env) {
   env->bird = generateBird();
 
-  for (int i = 0; i < 3; i++) {
+  env->pipes[0] = (PipePair *)calloc(1, sizeof(PipePair));
+  // we dont set the first pipe because we wouldnt render pipe "0"
+  for (int i = 1; i < 3; i++) {
     env->pipes[i] = (PipePair *)calloc(1, sizeof(PipePair));
     setPipeList(env->pipes[i]);
   }
@@ -97,7 +99,6 @@ bool checkCollisions(Bird *bird, PipePair *pipes) {
   if (bird->y_pos > HEIGHT) {
     return true;
   }
-    
 
   // check collision with the top pipe
   bool collisionY = bird->y_pos - bird->radius < pipes->gapY;
