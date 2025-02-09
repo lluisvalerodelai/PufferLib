@@ -17,12 +17,12 @@ cdef extern from "flappy_bird.h":
         int gapWidth
 
     ctypedef struct Flappy_env:
-        int* state[4]
+        int state[4]
         Bird* bird
         PipePair* pipes[3]
-        int action
-        int reward
-        unsigned char done
+        int *actions
+        int *rewards
+        unsigned char *terminals
 
     ctypedef struct Flappy_client:
         int WIDTH
@@ -46,20 +46,21 @@ cdef class CyFlappy:
     cdef:
         Flappy_env* env
         Flappy_client* client
-        int action
 
-    def __init__(self):
+    def __init__(self, int [:] rewards, int[:] actions, unsigned char[:] terminals):
         self.env = <Flappy_env*>calloc(1, sizeof(Flappy_env))
         self.client = NULL
-        self.action = 0
         allocate(self.env)
+
+        self.env.actions = &actions[0]
+        self.env.rewards = &rewards[0]
+        self.env.terminals = &terminals[0]
 
     def reset(self):
         c_reset(self.env)
 
     def step(self, int action):
-        self.action = action
-        self.env.action = action
+        self.env.actions[0] = action
         c_step(self.env)
 
     def render(self):

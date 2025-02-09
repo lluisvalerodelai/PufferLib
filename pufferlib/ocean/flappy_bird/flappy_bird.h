@@ -28,12 +28,12 @@ typedef struct {
 } PipePair;
 
 typedef struct {
-  int *state[4];
+  int state[4];
   Bird *bird;
   PipePair *pipes[3];
-  int action;
-  int reward;
-  unsigned char done;
+  int *actions;
+  int *rewards;
+  unsigned char *terminals;
 } Flappy_env;
 
 typedef struct {
@@ -70,6 +70,10 @@ void allocate(Flappy_env *env) {
     env->pipes[i] = (PipePair *)calloc(1, sizeof(PipePair));
     setPipeList(env->pipes[i]);
   }
+
+  env->actions = (int *)calloc(1, sizeof(int));
+  env->rewards = (int *)calloc(1, sizeof(int));
+  env->terminals = (unsigned char *)calloc(1, sizeof(unsigned char));
 }
 
 Flappy_client *make_client() {
@@ -89,9 +93,9 @@ void c_reset(Flappy_env *env) {
   env->bird->radius = 15;
 
   // reset the **values** of the environment, but not the pointers
-  env->action = NOOP;
-  env->done = false;
-  env->reward = 0;
+  env->actions[0] = NOOP;
+  env->terminals[0] = false;
+  env->rewards[0] = 0;
 }
 
 unsigned char checkCollisions(Bird *bird, PipePair *pipes) {
@@ -141,8 +145,10 @@ PipePair *new_pipe() {
 
 void c_step(Flappy_env *env) {
 
+  int action = env->actions[0];
+
   // update velocities
-  if (env->action == JUMP) {
+  if (action == JUMP) {
     env->bird->vertical_velocity = -10;
   }
 
@@ -162,9 +168,9 @@ void c_step(Flappy_env *env) {
 
   // check if env is done
   if (checkCollisions(env->bird, env->pipes[1])) {
-    env->done = true;
+    env->terminals[0] = true;
   } else {
-    env->reward += 1;
+    env->rewards[0] += 1;
   }
 }
 
@@ -185,7 +191,6 @@ void c_render(Flappy_client *client, Flappy_env *env) {
 
   BeginDrawing();
 
-
   DrawCircle(env->bird->x_pos, env->bird->y_pos, env->bird->radius, RED);
   renderPipes(env->pipes[0]);
 
@@ -197,7 +202,7 @@ void c_render(Flappy_client *client, Flappy_env *env) {
     renderPipes(env->pipes[2]);
   }
 
-  char *score_str = uint_to_str(env->reward);
+  char *score_str = uint_to_str(env->rewards[0]);
   DrawText(score_str, 0, 0, 50, WHITE);
   free(score_str);
 
