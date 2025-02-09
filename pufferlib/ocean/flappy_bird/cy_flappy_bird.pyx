@@ -59,8 +59,7 @@ cdef class CyFlappy:
     def reset(self):
         c_reset(self.env)
 
-    def step(self, int action):
-        self.env.actions[0] = action
+    def step(self):
         c_step(self.env)
 
     def render(self):

@@ -14,14 +14,18 @@ env = CyFlappy(rewards, actions, terminals)
 
 env.reset()
 
-for _ in range(100):
+for i in range(100):
 
     print(rewards)
     print(terminals)
     print(actions)
 
-    action = 0
-    env.step(action)
+    if i == 50:
+        actions[0] = 1
+
+    env.step()
     env.render()
+
+    actions[0] = 0
 
 env.close()
