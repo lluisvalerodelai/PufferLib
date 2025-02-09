@@ -46,19 +46,18 @@ cdef class CyFlappy:
     cdef:
         Flappy_env* env
         Flappy_client* client
-        int action
 
     def __init__(self):
         self.env = <Flappy_env*>calloc(1, sizeof(Flappy_env))
-        self.client = NULL
-        self.action = 0
         allocate(self.env)
+        self.env.bird = generateBird()
+
+        self.client = NULL
 
     def reset(self):
         c_reset(self.env)
 
     def step(self, int action):
-        self.action = action
         self.env.action = action
         c_step(self.env)
 
@@ -73,3 +72,4 @@ cdef class CyFlappy:
             self.client = NULL
 
         free_env(self.env)
+        free(self.env)

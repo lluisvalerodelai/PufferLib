@@ -12,7 +12,7 @@ int main(void) {
   c_reset(&env); 
   while (!WindowShouldClose()) {
 
-    if (env.done) {
+    if (env.done == 1) {
       break;
     }
 

@@ -33,7 +33,7 @@ typedef struct {
   PipePair *pipes[3];
   int action;
   int reward;
-  bool done;
+  unsigned char done;
 } Flappy_env;
 
 typedef struct {
@@ -94,7 +94,7 @@ void c_reset(Flappy_env *env) {
   env->reward = 0;
 }
 
-bool checkCollisions(Bird *bird, PipePair *pipes) {
+unsigned char checkCollisions(Bird *bird, PipePair *pipes) {
 
   if (bird->y_pos > HEIGHT) {
     return true;
@@ -185,8 +185,8 @@ void c_render(Flappy_client *client, Flappy_env *env) {
 
   BeginDrawing();
 
-  DrawCircle(env->bird->x_pos, env->bird->y_pos, env->bird->radius, RED);
 
+  DrawCircle(env->bird->x_pos, env->bird->y_pos, env->bird->radius, RED);
   renderPipes(env->pipes[0]);
 
   if (env->pipes[0]->gapX < env->bird->x_pos) {
