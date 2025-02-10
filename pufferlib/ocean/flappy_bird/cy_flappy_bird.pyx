@@ -17,7 +17,7 @@ cdef extern from "flappy_bird.h":
         int gapWidth
 
     ctypedef struct Flappy_env:
-        int state[4]
+        int *state
         Bird* bird
         PipePair* pipes[3]
         int *actions
@@ -44,32 +44,43 @@ cdef extern from "flappy_bird.h":
 
 cdef class CyFlappy:
     cdef:
-        Flappy_env* env
+        Flappy_env* envs
         Flappy_client* client
+        int num_envs
 
-    def __init__(self, int [:] rewards, int[:] actions, unsigned char[:] terminals):
-        self.env = <Flappy_env*>calloc(1, sizeof(Flappy_env))
+    def __init__(self, int[:, :] observations, int[:] actions, int[:] rewards, unsigned char[:] terminals, int num_envs):
+        self.envs = <Flappy_env*>calloc(num_envs, sizeof(Flappy_env))
+        self.num_envs = num_envs
         self.client = NULL
-        allocate(self.env)
 
-        self.env.actions = &actions[0]
-        self.env.rewards = &rewards[0]
-        self.env.terminals = &terminals[0]
+        cdef int i
+        for i in range(num_envs):
+            allocate(&self.envs[i])
+
+            self.envs[i].state = &observations[i, 0] 
+            self.envs[i].actions = &actions[i]
+            self.envs[i].rewards = &rewards[i]
+            self.envs[i].terminals = &terminals[i]
 
     def reset(self):
-        c_reset(self.env)
+        cdef int i
+        for i in range(self.num_envs):
+            c_reset(&self.envs[i])
+
 
     def step(self):
-        c_step(self.env)
+        cdef int i
+        for i in range(self.num_envs):
+            c_step(&self.envs[i])
 
     def render(self):
         if self.client == NULL:
             self.client = make_client()
-        c_render(self.client, self.env)
+        c_render(self.client, &self.envs[0])
 
     def close(self):
         if self.client != NULL:
             free_client(self.client)
             self.client = NULL
 
-        free_env(self.env)
+        free_env(self.envs)

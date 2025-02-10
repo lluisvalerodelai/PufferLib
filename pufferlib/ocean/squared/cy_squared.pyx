@@ -25,7 +25,6 @@ cdef class CySquared:
         Squared* envs
         Client* client
         int num_envs
-        int size
 
     def __init__(self, unsigned char[:, :] observations, int[:] actions,
             float[:] rewards, unsigned char[:] terminals, int num_envs, int size):

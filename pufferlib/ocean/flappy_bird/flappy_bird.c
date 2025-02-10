@@ -1,6 +1,7 @@
 #include "flappy_bird.h"
 #include "../../puffernet.h"
 #include "raylib.h"
+#include <stdio.h>
 
 int main(void) {
 
@@ -8,7 +9,6 @@ int main(void) {
   allocate(&env); // set all the default/0 values for the env
 
   Flappy_client *client = make_client();
-
 
   c_reset(&env);
   while (!WindowShouldClose()) {
@@ -27,6 +27,5 @@ int main(void) {
 
     c_step(&env);
     c_render(client, &env);
-    print_flappy_env(&env);
   }
 }

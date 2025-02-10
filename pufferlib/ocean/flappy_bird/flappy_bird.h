@@ -28,7 +28,7 @@ typedef struct {
 } PipePair;
 
 typedef struct {
-  int state[4];
+  int *state;
   Bird *bird;
   PipePair *pipes[3];
   int *actions;
@@ -39,7 +39,6 @@ typedef struct {
 typedef struct {
   int WIDTH;
   int HEIGHT;
-
 } Flappy_client;
 
 Bird *generateBird() {
@@ -71,9 +70,9 @@ void allocate(Flappy_env *env) {
     setPipeList(env->pipes[i]);
   }
 
-  env->actions = (int *)calloc(1, sizeof(int));
-  env->rewards = (int *)calloc(1, sizeof(int));
-  env->terminals = (unsigned char *)calloc(1, sizeof(unsigned char));
+  // env->actions = (int *)calloc(1, sizeof(int));
+  // env->rewards = (int *)calloc(1, sizeof(int));
+  // env->terminals = (unsigned char *)calloc(1, sizeof(unsigned char));
 }
 
 Flappy_client *make_client() {
@@ -87,12 +86,11 @@ Flappy_client *make_client() {
 }
 
 void c_reset(Flappy_env *env) {
-  // reset the bird, resetting radius and x_pos is redundant?
+  // resetting radius and x_pos is redundant?
   env->bird->y_pos = 0;
   env->bird->x_pos = 200;
   env->bird->radius = 15;
 
-  // reset the **values** of the environment, but not the pointers
   env->actions[0] = NOOP;
   env->terminals[0] = false;
   env->rewards[0] = 0;
@@ -149,7 +147,7 @@ void c_step(Flappy_env *env) {
 
   // update velocities
   if (action == JUMP) {
-    env->bird->vertical_velocity = -10;
+    env->bird->vertical_velocity = -12;
   }
 
   env->bird->y_pos += env->bird->vertical_velocity;
@@ -172,6 +170,11 @@ void c_step(Flappy_env *env) {
   } else {
     env->rewards[0] += 1;
   }
+
+  env->state[0] = env->bird->y_pos;
+  env->state[1] = env->pipes[1]->gapSize;
+  env->state[2] = env->pipes[1]->gapX;
+  env->state[3] = env->pipes[1]->gapY;
 }
 
 void renderPipes(PipePair *pipes) {
