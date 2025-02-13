@@ -1,7 +1,6 @@
 import gymnasium
 import numpy as np
-import time
-from cy_flappy_bird import CyFlappy
+from pufferlib.ocean.flappy_bird.cy_flappy_bird import CyFlappy
 import pufferlib
 
 class Flappy(pufferlib.PufferEnv):
